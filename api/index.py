@@ -131,6 +131,24 @@ async def verify(member_id: str, request: Request):
         except Exception:
             pass
 
+    # --- Insert into existing MySQL table ---
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        sql = """
+            INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
+        conn.commit()
+    except Exception as e:
+        return HTMLResponse(f"<h1 style='color:red;'>DB Error: {e}</h1>", status_code=500)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
     # --- Return simple HTML ---
     if is_valid:
         return HTMLResponse(
@@ -140,6 +158,7 @@ async def verify(member_id: str, request: Request):
         return HTMLResponse(
             f"<h1 style='color:red;'>❌ Verification Failed</h1>"
         )
+
 
 
 
