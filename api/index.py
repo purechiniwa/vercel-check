@@ -132,23 +132,32 @@ async def verify(member_id: str, request: Request):
             pass
 
     # --- Insert into existing MySQL table ---
-    conn = get_db()
-    cursor = conn.cursor()
-    sql = """
-        INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
-        VALUES (%s, %s, %s, %s, %s)
-    """
-    cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
-    cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        sql = """
+            INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
+        conn.commit()
+    except Exception as e:
+        return HTMLResponse(f"<h1 style='color:red;'>DB Error: {e}</h1>", status_code=500)
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
-    # --- Return JSON ---
-    return JSONResponse(
-        {
-            "verified": is_valid,
-        }
-    )
+    # --- Return simple HTML ---
+    if is_valid:
+        return HTMLResponse(
+            f"<h1 style='color:green;'>✅ Verification Success</h1><p>User {member_id} verified from Indonesia.</p>"
+        )
+    else:
+        return HTMLResponse(
+            f"<h1 style='color:red;'>❌ Verification Failed</h1><p>User {member_id} not verified.</p>"
+        )
+
 
 
