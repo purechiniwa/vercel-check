@@ -134,12 +134,13 @@ async def verify(member_id: str, request: Request):
     # --- Return simple HTML ---
     if is_valid:
         return HTMLResponse(
-            f"<h1 style='color:green;'>✅ Verification Success</h1><p>User {member_id} verified from Indonesia.</p>"
+            f"<h1 style='color:green;'>✅ Verification Success</h1>"
         )
     else:
         return HTMLResponse(
-            f"<h1 style='color:red;'>❌ Verification Failed</h1><p>User {member_id} not verified.</p>"
+            f"<h1 style='color:red;'>❌ Verification Failed</h1>"
         )
+
 
 
 
