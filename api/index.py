@@ -141,7 +141,7 @@ async def verify(member_id: str, request: Request):
         existing = cursor.fetchone()
 
         if existing:
-            if not existing["verified"]:  # if already exists but verified = False
+            if not is_valid:  # if already exists but verified = False
                 return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
             
             # update existing row except id and discord_id
@@ -179,6 +179,7 @@ async def verify(member_id: str, request: Request):
         return HTMLResponse("<h1 style='color:green;'>✅ Verification Success</h1>")
     else:
         return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
+
 
 
 
