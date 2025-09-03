@@ -168,10 +168,26 @@ async def dbtest():
         result = cursor.fetchone()
         return {"db_time": result}
     except Exception as e:
-        return {"error": str(e)}
+        import traceback
+        tb = traceback.format_exc()
+        print("DB ERROR:", tb)  # goes to Vercel logs
+        return {
+            "error": str(e),
+            "traceback": tb,
+            "env": {
+                "host": os.getenv("MYSQL_HOST"),
+                "user": os.getenv("MYSQL_USER"),
+                "db": os.getenv("MYSQL_DATABASE"),
+            },
+        }
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
+
+
 
 
 
