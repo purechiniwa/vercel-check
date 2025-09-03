@@ -137,10 +137,13 @@ async def verify(member_id: str, request: Request):
         cursor = conn.cursor(dictionary=True)
 
         # check if member already exists
-        cursor.execute("SELECT id FROM verify WHERE discord_id = %s", (member_id,))
+        cursor.execute("SELECT id, verified FROM verify WHERE discord_id = %s", (member_id,))
         existing = cursor.fetchone()
 
         if existing:
+            if not existing["verified"]:  # if already exists but verified = False
+                return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
+            
             # update existing row except id and discord_id
             sql_update = """
                 UPDATE verify
@@ -176,4 +179,6 @@ async def verify(member_id: str, request: Request):
         return HTMLResponse("<h1 style='color:green;'>✅ Verification Success</h1>")
     else:
         return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
+
+
 
