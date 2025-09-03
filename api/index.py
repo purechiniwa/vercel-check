@@ -4,6 +4,9 @@ import httpx
 import ipaddress
 import mysql.connector
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Whoami on Vercel", version="1.0.0")
 
@@ -165,4 +168,5 @@ async def verify(member_id: str, request: Request):
                 </body>
             </html>
             """
+
         )
