@@ -159,6 +159,20 @@ async def verify(member_id: str, request: Request):
             f"<h1 style='color:red;'>❌ Verification Failed</h1>"
         )
 
+@app.get("/dbtest")
+async def dbtest():
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT NOW()")
+        result = cursor.fetchone()
+        return {"db_time": result}
+    except Exception as e:
+        return {"error": str(e)}
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
+
 
 
 
