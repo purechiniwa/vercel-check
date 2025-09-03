@@ -44,7 +44,7 @@ def extract_ip_from_headers(headers: dict) -> str | None:
 async def health():
     return {"ok": True}
 
-@app.get("/")
+@app.get("/json")
 async def whoami(request: Request):
     # Headers are case-insensitive; FastAPI exposes a CIMultiDictProxy
     headers = {k.lower(): v for k, v in request.headers.items()}
@@ -90,3 +90,4 @@ async def whoami(request: Request):
             "user_agent": headers.get("user-agent"),
         }
     )
+
