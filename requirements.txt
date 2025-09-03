@@ -1,2 +1,4 @@
 fastapi
+mysql.connector
+os
 httpx
