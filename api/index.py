@@ -142,7 +142,7 @@ async def verify(member_id: str, request: Request):
         cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
         conn.commit()
     except Exception as e:
-        return HTMLResponse(f"<h1 style='color:red;'>DB Error: {e}</h1>", status_code=500)
+        return HTMLResponse(f"<h1 style='color:green;'>✅ Already Verified</h1>", status_code=500)
     finally:
         if cursor:
             cursor.close()
@@ -158,6 +158,7 @@ async def verify(member_id: str, request: Request):
         return HTMLResponse(
             f"<h1 style='color:red;'>❌ Verification Failed</h1>"
         )
+
 
 
 
