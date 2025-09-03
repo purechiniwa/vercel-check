@@ -1,14 +1,14 @@
 {
-  "version": 2,
-  "functions": {
-    "api/*.py": {
-      "runtime": "@vercel/[email protected]"
-    }
-  },
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "api/myip.py"
-    }
-  ]
+    "builds": [
+        {
+            "src": "api/main.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "api/myip.py"
+        }
+    ]
 }
