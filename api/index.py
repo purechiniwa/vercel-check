@@ -90,4 +90,38 @@ async def whoami(request: Request):
             "user_agent": headers.get("user-agent"),
         }
     )
+@app.get("/verify/{member_id}")
+async def verify(member_id: str, request: Request):
+    # Extract headers (case-insensitive)
+    headers = {k.lower(): v for k, v in request.headers.items()}
+    ip = extract_ip_from_headers(headers) or request.client.host
+
+    # Validate IP
+    try:
+        ipaddress.ip_address(ip)
+        valid_ip = True
+    except Exception:
+        valid_ip = False
+
+    is_valid = False
+    country_name = None
+
+    if valid_ip:
+        url = f"https://ipapi.co/{ip}/json/"
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                r = await client.get(url)
+                if r.status_code == 200:
+                    data = r.json()
+                    country_name = data.get("country_name")
+                    if country_name and country_name.lower() == "indonesia":
+                        is_valid = True
+        except Exception:
+            pass
+
+    return JSONResponse(
+        {
+            "verified": is_valid,
+        }
+    )
 
