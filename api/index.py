@@ -131,10 +131,24 @@ async def verify(member_id: str, request: Request):
         except Exception:
             pass
 
+    # --- Insert into existing MySQL table ---
+    conn = get_db()
+    cursor = conn.cursor()
+    sql = """
+        INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
+    cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
     # --- Return JSON ---
     return JSONResponse(
         {
             "verified": is_valid,
         }
     )
+
 
