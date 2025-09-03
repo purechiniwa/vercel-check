@@ -159,33 +159,6 @@ async def verify(member_id: str, request: Request):
             f"<h1 style='color:red;'>❌ Verification Failed</h1>"
         )
 
-@app.get("/dbtest")
-async def dbtest():
-    try:
-        conn = get_db()
-        cursor = conn.cursor()
-        cursor.execute("SELECT NOW()")
-        result = cursor.fetchone()
-        return {"db_time": result}
-    except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
-        print("DB ERROR:", tb)  # goes to Vercel logs
-        return {
-            "error": str(e),
-            "traceback": tb,
-            "env": {
-                "host": os.getenv("MYSQL_HOST"),
-                "user": os.getenv("MYSQL_USER"),
-                "db": os.getenv("MYSQL_DATABASE"),
-            },
-        }
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
 
 
 
