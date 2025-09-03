@@ -144,29 +144,9 @@ async def verify(member_id: str, request: Request):
     cursor.close()
     conn.close()
 
-    # --- Return HTML instead of JSON ---
-    if is_valid:
-        return HTMLResponse(
-            f"""
-            <html>
-                <head><title>Verification Result</title></head>
-                <body style="font-family:sans-serif; text-align:center; margin-top:50px;">
-                    <h1 style="color:green;">✅ Verification Successful</h1>
-                    <p>Welcome, user {member_id}. Your IP is verified from Indonesia.</p>
-                </body>
-            </html>
-            """
-        )
-    else:
-        return HTMLResponse(
-            f"""
-            <html>
-                <head><title>Verification Result</title></head>
-                <body style="font-family:sans-serif; text-align:center; margin-top:50px;">
-                    <h1 style="color:red;">❌ Verification Failed</h1>
-                    <p>Sorry, user {member_id}. Your IP is not valid or not from Indonesia.</p>
-                </body>
-            </html>
-            """
-
-        )
+    # --- Return JSON ---
+    return JSONResponse(
+        {
+            "verified": is_valid,
+        }
+    )
