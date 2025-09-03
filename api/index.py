@@ -90,6 +90,7 @@ async def whoami(request: Request):
             "user_agent": headers.get("user-agent"),
         }
     )
+    
 @app.get("/verify/{member_id}")
 async def verify(member_id: str, request: Request):
     # Extract headers (case-insensitive)
@@ -121,7 +122,7 @@ async def verify(member_id: str, request: Request):
 
     return JSONResponse(
         {
+            "member_id": member_id,
             "verified": is_valid,
         }
     )
-
