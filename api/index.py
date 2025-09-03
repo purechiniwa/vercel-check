@@ -131,28 +131,35 @@ async def verify(member_id: str, request: Request):
         except Exception:
             pass
 
-    # --- Insert or check duplicates ---
+    # --- Insert or update duplicates (except id and discord_id) ---
     try:
         conn = get_db()
         cursor = conn.cursor(dictionary=True)
 
         # check if member already exists
-        cursor.execute("SELECT verified FROM verify WHERE discord_id = %s", (member_id,))
+        cursor.execute("SELECT id FROM verify WHERE discord_id = %s", (member_id,))
         existing = cursor.fetchone()
 
         if existing:
-            # already verified or not
-            if existing["verified"]:
-                return HTMLResponse("<h1 style='color:green;'>✅ Already Verified</h1>")
-            else:
-                return HTMLResponse("<h1 style='color:red;'>❌ Not Verified</h1>")
+            # update existing row except id and discord_id
+            sql_update = """
+                UPDATE verify
+                SET ip = %s,
+                    country_name = %s,
+                    ip_is_valid = %s,
+                    verified = %s
+                WHERE discord_id = %s
+            """
+            cursor.execute(sql_update, (ip, country_name, valid_ip, is_valid, member_id))
+            conn.commit()
+            return HTMLResponse("<h1 style='color:green;'>✅ Verification Updated</h1>")
 
         # if not exists, insert new
-        sql = """
+        sql_insert = """
             INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
             VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
+        cursor.execute(sql_insert, (member_id, ip, country_name, valid_ip, is_valid))
         conn.commit()
 
     except Exception as e:
@@ -169,15 +176,4 @@ async def verify(member_id: str, request: Request):
         return HTMLResponse("<h1 style='color:green;'>✅ Verification Success</h1>")
     else:
         return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
-
-
-
-
-
-
-
-
-
-
-
 
