@@ -131,18 +131,33 @@ async def verify(member_id: str, request: Request):
         except Exception:
             pass
 
-    # --- Insert into existing MySQL table ---
+    # --- Insert or check duplicates ---
     try:
         conn = get_db()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # check if member already exists
+        cursor.execute("SELECT verified FROM verify WHERE discord_id = %s", (member_id,))
+        existing = cursor.fetchone()
+
+        if existing:
+            # already verified or not
+            if existing["verified"]:
+                return HTMLResponse("<h1 style='color:green;'>✅ Already Verified</h1>")
+            else:
+                return HTMLResponse("<h1 style='color:red;'>❌ Not Verified</h1>")
+
+        # if not exists, insert new
         sql = """
             INSERT INTO verify (discord_id, ip, country_name, ip_is_valid, verified)
             VALUES (%s, %s, %s, %s, %s)
         """
         cursor.execute(sql, (member_id, ip, country_name, valid_ip, is_valid))
         conn.commit()
+
     except Exception as e:
-        return HTMLResponse(f"<h1 style='color:green;'>✅ Already Verified</h1>", status_code=500)
+        return HTMLResponse(f"<h1 style='color:red;'>⚠️ Database Error</h1>", status_code=500)
+
     finally:
         if cursor:
             cursor.close()
@@ -151,13 +166,11 @@ async def verify(member_id: str, request: Request):
 
     # --- Return simple HTML ---
     if is_valid:
-        return HTMLResponse(
-            f"<h1 style='color:green;'>✅ Verification Success</h1>"
-        )
+        return HTMLResponse("<h1 style='color:green;'>✅ Verification Success</h1>")
     else:
-        return HTMLResponse(
-            f"<h1 style='color:red;'>❌ Verification Failed</h1>"
-        )
+        return HTMLResponse("<h1 style='color:red;'>❌ Verification Failed</h1>")
+
+
 
 
 
